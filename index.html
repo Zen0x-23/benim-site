@@ -56,9 +56,9 @@
       <div id="upgrades"></div>
 
       <h3>Kutular</h3>
-      <button class="box" onclick="openBox('small')">🎁 Küçük Kutu</button>
-      <button class="box" onclick="openBox('big')">🎁 Büyük Kutu</button>
-      <button class="box" onclick="openBox('mega')">🎁 Mega Kutu</button>
+      <button class="box" onclick="openBox('small')">🎁 Küçük Kutu (30 puan)</button>
+      <button class="box" onclick="openBox('big')">🎁 Büyük Kutu (70 puan)</button>
+      <button class="box" onclick="openBox('mega')">🎁 Mega Kutu (150 puan)</button>
 
       <div id="leaderboard">
         <h3>🏆 Liderlik Tablosu</h3>
@@ -137,10 +137,18 @@
     }
 
     function openBox(type) {
+      let cost = 0;
       let reward = 0;
-      if (type === 'small') reward = Math.floor(Math.random() * 40 + 10);
-      else if (type === 'big') reward = Math.floor(Math.random() * 120 + 30);
-      else if (type === 'mega') reward = Math.floor(Math.random() * 500 + 100);
+      if (type === 'small') { cost = 30; reward = Math.floor(Math.random() * 40 + 10); }
+      else if (type === 'big') { cost = 70; reward = Math.floor(Math.random() * 120 + 30); }
+      else if (type === 'mega') { cost = 150; reward = Math.floor(Math.random() * 500 + 100); }
+
+      if (score < cost) {
+        alert(`Yetersiz puan! (${cost} puan gerekiyor)`);
+        return;
+      }
+
+      score -= cost;
       reward += Math.floor(reward * bonusBox);
       alert(`${type.toUpperCase()} kutusundan ${reward} puan çıktı!`);
       score += reward;
