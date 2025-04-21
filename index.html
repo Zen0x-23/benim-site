@@ -2,23 +2,26 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Clicker Oyunu</title>
+  <title>Clicker Oyunu Gelişmiş</title>
   <style>
     body {
-      background-color: #121212;
+      background-color: #1b1b1b;
       color: #fff;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 80px;
+      padding: 50px;
     }
+
     h1 {
-      font-size: 40px;
-      margin-bottom: 30px;
+      font-size: 2.5em;
+      margin-bottom: 20px;
     }
-    #puan {
-      font-size: 32px;
-      margin: 20px 0;
+
+    #puan, #seviye, #kayitli {
+      font-size: 1.5em;
+      margin: 10px;
     }
+
     button {
       padding: 15px 30px;
       font-size: 18px;
@@ -26,49 +29,75 @@
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.2s;
     }
-    #tikla {
-      background-color: #1e90ff;
+
+    #tiklaBtn {
+      background-color: #007bff;
       color: white;
     }
-    #tikla:hover {
-      background-color: #0d6efd;
+
+    #tiklaBtn:hover {
+      background-color: #0056b3;
     }
-    #oto {
+
+    #otoBtn {
       background-color: #28a745;
       color: white;
     }
-    #oto:hover {
-      background-color: #218838;
+
+    #otoBtn:disabled {
+      background-color: #4e4e4e;
     }
-    #seviye {
-      margin-top: 15px;
-      font-size: 20px;
-      color: #ffcc00;
+
+    #upgradeBtn {
+      background-color: #ffc107;
+      color: #000;
+    }
+
+    #upgradeBtn:disabled {
+      background-color: #4e4e4e;
     }
   </style>
 </head>
 <body>
 
-  <h1>🔥 Clicker Oyunu 🔥</h1>
+  <h1>🔥 Süper Clicker Oyunu 🔥</h1>
   <div id="puan">Puan: 0</div>
-  <button id="tikla">Tıkla!</button>
-  <button id="oto">Oto-Tıkla Satın Al (100 puan)</button>
   <div id="seviye">Seviye: 1</div>
+  <div id="kayitli">Son kayıtlı puan: 0</div>
+
+  <button id="tiklaBtn">Tıkla!</button>
+  <button id="otoBtn">Oto-Tıkla (100 puan)</button>
+  <button id="upgradeBtn">2x Kazanç (200 puan)</button>
+
+  <!-- Ses efekti -->
+  <audio id="sesEfekti" src="https://www.soundjay.com/button/button-3.mp3" preload="auto"></audio>
 
   <script>
-    let puan = 0;
-    let seviye = 1;
+    let puan = parseInt(localStorage.getItem("puan")) || 0;
+    let seviye = Math.floor(puan / 50) + 1;
     let autoClick = false;
+    let upgrade = false;
 
     const puanYazi = document.getElementById("puan");
     const seviyeYazi = document.getElementById("seviye");
-    const tiklaBtn = document.getElementById("tikla");
-    const otoBtn = document.getElementById("oto");
+    const kayitliYazi = document.getElementById("kayitli");
+    const tiklaBtn = document.getElementById("tiklaBtn");
+    const otoBtn = document.getElementById("otoBtn");
+    const upgradeBtn = document.getElementById("upgradeBtn");
+    const ses = document.getElementById("sesEfekti");
+
+    function guncelle() {
+      puanYazi.textContent = `Puan: ${puan}`;
+      seviye = Math.floor(puan / 50) + 1;
+      seviyeYazi.textContent = `Seviye: ${seviye}`;
+      localStorage.setItem("puan", puan);
+    }
 
     tiklaBtn.onclick = () => {
-      puan += 1;
+      puan += upgrade ? 2 : 1;
+      ses.play();
       guncelle();
     };
 
@@ -78,21 +107,25 @@
         autoClick = true;
         otoBtn.disabled = true;
         setInterval(() => {
-          puan += 1;
+          puan += upgrade ? 2 : 1;
           guncelle();
         }, 1000);
         guncelle();
       }
     };
 
-    function guncelle() {
-      puanYazi.textContent = `Puan: ${puan}`;
-      const yeniSeviye = Math.floor(puan / 50) + 1;
-      if (yeniSeviye !== seviye) {
-        seviye = yeniSeviye;
-        seviyeYazi.textContent = `Seviye: ${seviye}`;
+    upgradeBtn.onclick = () => {
+      if (puan >= 200 && !upgrade) {
+        puan -= 200;
+        upgrade = true;
+        upgradeBtn.disabled = true;
+        guncelle();
       }
-    }
+    };
+
+    // Başlangıçta göster
+    guncelle();
+    kayitliYazi.textContent = "Son kayıtlı puan: " + puan;
   </script>
 
 </body>
