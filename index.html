@@ -38,24 +38,9 @@
       padding: 20px;
       border-radius: 10px;
     }
-    .golden-click {
-      background: gold;
-      color: black;
-      font-weight: bold;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      top: 100px;
-    }
-    #themeToggle {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-    }
   </style>
 </head>
 <body>
-  <button id="themeToggle" onclick="toggleTheme()">🌙 Tema</button>
   <div id="game">
     <h1>🔥 Clicker Oyunu 🔥</h1>
     <div id="namePrompt">
@@ -67,13 +52,11 @@
       <h2 id="greeting"></h2>
       <h3 id="score">Puan: 0</h3>
       <button onclick="clickButton()">TIKLA</button>
-      <button onclick="startMiniGame()">⏱️ 5 Saniyelik Yarışma</button>
+
       <div id="upgrades"></div>
 
       <h3>Kutular</h3>
-      <button class="box" onclick="openBox('small')">🎁 Küçük Kutu (30 puan)</button>
-      <button class="box" onclick="openBox('big')">🎁 Büyük Kutu (70 puan)</button>
-      <button class="box" onclick="openBox('mega')">🎁 Mega Kutu (150 puan)</button>
+      <div id="boxes"></div>
 
       <div style="margin-top:20px">
         <h3>🎁 Hediye Kodu</h3>
@@ -88,9 +71,6 @@
     </div>
   </div>
 
-  <button id="goldenClick" class="golden-click hidden" onclick="goldenReward()">💰 ALTIN TIK!</button>
-  <audio id="clickSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
-
   <script>
     let score = 0;
     let power = 1;
@@ -98,7 +78,6 @@
     let bonusBox = 0;
     let playerName = '';
     let usedCodes = [];
-    let isDark = true;
 
     const giftCodes = {
       "release": 100,
@@ -108,22 +87,27 @@
       "dayanamıyorumdayanamıyorum": 1000
     };
 
-    const upgrades = [
-      { name: '2x Tıklama Gücü', cost: 50, effect: () => power *= 2 },
-      { name: 'Pasif Gelir +1/sn', cost: 100, effect: () => startAuto(1000, 1) },
-      { name: 'Tıklama +5', cost: 150, effect: () => power += 5 },
-      { name: 'Pasif Gelir +5/sn', cost: 300, effect: () => startAuto(1000, 5) },
-      { name: '3x Tıklama Gücü', cost: 400, effect: () => power *= 3 },
-      { name: 'Pasif Gelir +10/sn', cost: 500, effect: () => startAuto(1000, 10) },
-      { name: 'Süper Hız 0.5sn', cost: 800, effect: () => startAuto(500, 5) },
-      { name: 'Tıklama +10', cost: 1000, effect: () => power += 10 },
-      { name: 'Mega Tıklama', cost: 1500, effect: () => power *= 5 },
-      { name: 'Pasif Gelir +20/sn', cost: 2000, effect: () => startAuto(1000, 20) },
-      { name: 'Kutulardan Çıkan %50 Bonus', cost: 2500, effect: () => bonusBox += 0.5 },
-      { name: '4x Tıklama Gücü', cost: 3000, effect: () => power *= 4 },
-      { name: 'Sonsuz Mod', cost: 4000, effect: () => startAuto(100, 2) },
-      { name: 'Ultra Güç', cost: 5000, effect: () => power += 100 },
-      { name: 'Tanrı Tıklaması', cost: 10000, effect: () => power *= 10 }
+    const upgrades = Array.from({length: 60}, (_, i) => {
+      return {
+        name: `Geliştirme ${i + 1}`,
+        cost: (i + 1) * 100,
+        effect: () => {
+          power += Math.ceil((i + 1) * 0.5);
+        }
+      };
+    });
+
+    const boxTypes = [
+      { name: 'Kutu 1', cost: 20, rewardMin: 10, rewardMax: 50 },
+      { name: 'Kutu 2', cost: 40, rewardMin: 30, rewardMax: 100 },
+      { name: 'Kutu 3', cost: 60, rewardMin: 50, rewardMax: 150 },
+      { name: 'Kutu 4', cost: 80, rewardMin: 60, rewardMax: 180 },
+      { name: 'Kutu 5', cost: 100, rewardMin: 80, rewardMax: 220 },
+      { name: 'Kutu 6', cost: 120, rewardMin: 90, rewardMax: 300 },
+      { name: 'Kutu 7', cost: 150, rewardMin: 120, rewardMax: 400 },
+      { name: 'Kutu 8', cost: 180, rewardMin: 150, rewardMax: 500 },
+      { name: 'Kutu 9', cost: 200, rewardMin: 180, rewardMax: 600 },
+      { name: 'Kutu 10', cost: 250, rewardMin: 200, rewardMax: 800 }
     ];
 
     function startGame() {
@@ -133,25 +117,17 @@
       document.getElementById("mainGame").classList.remove("hidden");
       document.getElementById("greeting").innerText = `Hoş geldin, ${playerName}!`;
       renderUpgrades();
+      renderBoxes();
       updateLeaderboard();
-      setInterval(showGoldenClick, 15000);
     }
 
     function clickButton() {
       score += power;
-      document.getElementById("clickSound").play();
       updateScore();
     }
 
     function updateScore() {
       document.getElementById("score").innerText = `Puan: ${score}`;
-    }
-
-    function startAuto(speed, amount) {
-      setInterval(() => {
-        score += amount;
-        updateScore();
-      }, speed);
     }
 
     function renderUpgrades() {
@@ -172,21 +148,27 @@
       });
     }
 
-    function openBox(type) {
-      let cost = 0;
-      let reward = 0;
-      if (type === 'small') { cost = 30; reward = Math.floor(Math.random() * 40 + 10); }
-      else if (type === 'big') { cost = 70; reward = Math.floor(Math.random() * 120 + 30); }
-      else if (type === 'mega') { cost = 150; reward = Math.floor(Math.random() * 500 + 100); }
+    function renderBoxes() {
+      const boxDiv = document.getElementById("boxes");
+      boxTypes.forEach((box, i) => {
+        const btn = document.createElement("button");
+        btn.className = "box";
+        btn.innerText = `${box.name} (${box.cost} puan)`;
+        btn.onclick = () => openBox(i);
+        boxDiv.appendChild(btn);
+      });
+    }
 
-      if (score < cost) {
-        alert(`Yetersiz puan! (${cost} puan gerekiyor)`);
+    function openBox(index) {
+      const box = boxTypes[index];
+      if (score < box.cost) {
+        alert(`Yetersiz puan! (${box.cost} puan gerekiyor)`);
         return;
       }
-
-      score -= cost;
+      score -= box.cost;
+      let reward = Math.floor(Math.random() * (box.rewardMax - box.rewardMin + 1) + box.rewardMin);
       reward += Math.floor(reward * bonusBox);
-      alert(`${type.toUpperCase()} kutusundan ${reward} puan çıktı!`);
+      alert(`${box.name} kutusundan ${reward} puan çıktı!`);
       score += reward;
       updateScore();
       saveScore();
@@ -228,45 +210,6 @@
         list.appendChild(li);
       });
     }
-
-    function toggleTheme() {
-      isDark = !isDark;
-      document.body.style.background = isDark ? "#121212" : "#ffffff";
-      document.body.style.color = isDark ? "white" : "black";
-    }
-
-    function startMiniGame() {
-      let count = 0;
-      const tempPower = power;
-      power = 1;
-      alert("5 saniyede en fazla tıkla!");
-      const originalClick = clickButton;
-      const timer = setTimeout(() => {
-        power = tempPower;
-        alert(`Süre doldu! Toplam ${count} tıklama yaptın.`);
-      }, 5000);
-      clickButton = function () {
-        count++;
-        score++;
-        updateScore();
-      };
-      setTimeout(() => clickButton = originalClick, 5000);
-    }
-
-    function showGoldenClick() {
-      const btn = document.getElementById("goldenClick");
-      btn.classList.remove("hidden");
-      setTimeout(() => btn.classList.add("hidden"), 4000);
-    }
-
-    function goldenReward() {
-      const reward = Math.floor(Math.random() * 100 + 100);
-      alert(`Altın tık ile ${reward} puan kazandın!`);
-      score += reward;
-      updateScore();
-      document.getElementById("goldenClick").classList.add("hidden");
-    }
   </script>
 </body>
 </html>
-
