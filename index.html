@@ -87,9 +87,27 @@
       "dayanamıyorumdayanamıyorum": 1000
     };
 
+    const upgradeNames = [
+      "Fare Tekerleği",
+      "Turbo Tıklayıcı",
+      "Oto-Tıkla 3000",
+      "Mega Parmak",
+      "Altın Parmak",
+      "Zihinle Tıklama",
+      "Parmak Kas Gücü",
+      "Tıklama Asistanı",
+      "Nano Robot",
+      "Yapay Zeka Tıklayıcı",
+      "Uzaylı Yardımcısı",
+      "Boyut Kapısı",
+      "Tıklama Portali",
+      "Evren Makinesi",
+      "Tıklama Tanrısı"
+    ];
+
     const upgrades = Array.from({length: 60}, (_, i) => {
       return {
-        name: `Geliştirme ${i + 1}`,
+        name: upgradeNames[i % upgradeNames.length] + ` +${Math.floor(i / upgradeNames.length) + 1}`,
         cost: (i + 1) * 100,
         effect: () => {
           power += Math.ceil((i + 1) * 0.5);
@@ -97,18 +115,27 @@
       };
     });
 
-    const boxTypes = [
-      { name: 'Kutu 1', cost: 20, rewardMin: 10, rewardMax: 50 },
-      { name: 'Kutu 2', cost: 40, rewardMin: 30, rewardMax: 100 },
-      { name: 'Kutu 3', cost: 60, rewardMin: 50, rewardMax: 150 },
-      { name: 'Kutu 4', cost: 80, rewardMin: 60, rewardMax: 180 },
-      { name: 'Kutu 5', cost: 100, rewardMin: 80, rewardMax: 220 },
-      { name: 'Kutu 6', cost: 120, rewardMin: 90, rewardMax: 300 },
-      { name: 'Kutu 7', cost: 150, rewardMin: 120, rewardMax: 400 },
-      { name: 'Kutu 8', cost: 180, rewardMin: 150, rewardMax: 500 },
-      { name: 'Kutu 9', cost: 200, rewardMin: 180, rewardMax: 600 },
-      { name: 'Kutu 10', cost: 250, rewardMin: 200, rewardMax: 800 }
+    const boxNames = [
+      "Ahşap Kutu",
+      "Gümüş Kutu",
+      "Altın Kutu",
+      "Elmas Kutu",
+      "Efsanevi Kutu",
+      "Paralel Evren Kutusu",
+      "Mega Enerji Kutusu",
+      "Zaman Kutusu",
+      "Uzay Kutusu",
+      "Tanrısal Kutu"
     ];
+
+    const boxTypes = boxNames.map((name, i) => {
+      return {
+        name: name,
+        cost: 20 + i * 20,
+        rewardMin: 10 + i * 20,
+        rewardMax: 50 + i * 75
+      };
+    });
 
     function startGame() {
       playerName = document.getElementById("playerName").value;
