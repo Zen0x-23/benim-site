@@ -5,46 +5,94 @@
   <title>Clicker Oyunu</title>
   <style>
     body {
-      background-color: #f2f2f2;
+      background-color: #121212;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      font-family: Arial, sans-serif;
-      padding-top: 100px;
+      padding-top: 80px;
     }
-    #button {
-      padding: 20px 40px;
-      font-size: 24px;
-      background-color: #4CAF50;
-      color: white;
+    h1 {
+      font-size: 40px;
+      margin-bottom: 30px;
+    }
+    #puan {
+      font-size: 32px;
+      margin: 20px 0;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      margin: 10px;
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 5px #2e7d32;
+      transition: 0.3s;
     }
-    #button:active {
-      box-shadow: 0 2px #2e7d32;
-      transform: translateY(3px);
+    #tikla {
+      background-color: #1e90ff;
+      color: white;
     }
-    #score {
-      font-size: 32px;
-      margin-top: 20px;
+    #tikla:hover {
+      background-color: #0d6efd;
+    }
+    #oto {
+      background-color: #28a745;
+      color: white;
+    }
+    #oto:hover {
+      background-color: #218838;
+    }
+    #seviye {
+      margin-top: 15px;
+      font-size: 20px;
+      color: #ffcc00;
     }
   </style>
 </head>
 <body>
 
-  <h1>✨ Clicker Oyunu ✨</h1>
-  <button id="button">Tıkla!</button>
-  <div id="score">Skor: 0</div>
+  <h1>🔥 Clicker Oyunu 🔥</h1>
+  <div id="puan">Puan: 0</div>
+  <button id="tikla">Tıkla!</button>
+  <button id="oto">Oto-Tıkla Satın Al (100 puan)</button>
+  <div id="seviye">Seviye: 1</div>
 
   <script>
-    let skor = 0;
-    const button = document.getElementById("button");
-    const scoreDiv = document.getElementById("score");
+    let puan = 0;
+    let seviye = 1;
+    let autoClick = false;
 
-    button.onclick = () => {
-      skor++;
-      scoreDiv.textContent = "Skor: " + skor;
+    const puanYazi = document.getElementById("puan");
+    const seviyeYazi = document.getElementById("seviye");
+    const tiklaBtn = document.getElementById("tikla");
+    const otoBtn = document.getElementById("oto");
+
+    tiklaBtn.onclick = () => {
+      puan += 1;
+      guncelle();
     };
+
+    otoBtn.onclick = () => {
+      if (puan >= 100 && !autoClick) {
+        puan -= 100;
+        autoClick = true;
+        otoBtn.disabled = true;
+        setInterval(() => {
+          puan += 1;
+          guncelle();
+        }, 1000);
+        guncelle();
+      }
+    };
+
+    function guncelle() {
+      puanYazi.textContent = `Puan: ${puan}`;
+      const yeniSeviye = Math.floor(puan / 50) + 1;
+      if (yeniSeviye !== seviye) {
+        seviye = yeniSeviye;
+        seviyeYazi.textContent = `Seviye: ${seviye}`;
+      }
+    }
   </script>
 
 </body>
