@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Benim Sitem</title>
+  <title>Clicker Oyunu</title>
   <style>
     body {
       background-color: #f2f2f2;
@@ -10,16 +10,42 @@
       font-family: Arial, sans-serif;
       padding-top: 100px;
     }
-    h1 {
-      color: #333;
+    #button {
+      padding: 20px 40px;
+      font-size: 24px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 5px #2e7d32;
     }
-    p {
-      color: #666;
+    #button:active {
+      box-shadow: 0 2px #2e7d32;
+      transform: translateY(3px);
+    }
+    #score {
+      font-size: 32px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>Merhaba, ben Yunus!</h1>
-  <p>Bu benim ilk web sitem ✨</p>
+
+  <h1>✨ Clicker Oyunu ✨</h1>
+  <button id="button">Tıkla!</button>
+  <div id="score">Skor: 0</div>
+
+  <script>
+    let skor = 0;
+    const button = document.getElementById("button");
+    const scoreDiv = document.getElementById("score");
+
+    button.onclick = () => {
+      skor++;
+      scoreDiv.textContent = "Skor: " + skor;
+    };
+  </script>
+
 </body>
 </html>
