@@ -38,9 +38,24 @@
       padding: 20px;
       border-radius: 10px;
     }
+    .golden-click {
+      background: gold;
+      color: black;
+      font-weight: bold;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 100px;
+    }
+    #themeToggle {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+    }
   </style>
 </head>
 <body>
+  <button id="themeToggle" onclick="toggleTheme()">🌙 Tema</button>
   <div id="game">
     <h1>🔥 Clicker Oyunu 🔥</h1>
     <div id="namePrompt">
@@ -52,7 +67,7 @@
       <h2 id="greeting"></h2>
       <h3 id="score">Puan: 0</h3>
       <button onclick="clickButton()">TIKLA</button>
-
+      <button onclick="startMiniGame()">⏱️ 5 Saniyelik Yarışma</button>
       <div id="upgrades"></div>
 
       <h3>Kutular</h3>
@@ -73,6 +88,9 @@
     </div>
   </div>
 
+  <button id="goldenClick" class="golden-click hidden" onclick="goldenReward()">💰 ALTIN TIK!</button>
+  <audio id="clickSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
+
   <script>
     let score = 0;
     let power = 1;
@@ -80,6 +98,7 @@
     let bonusBox = 0;
     let playerName = '';
     let usedCodes = [];
+    let isDark = true;
 
     const giftCodes = {
       "release": 100,
@@ -115,10 +134,12 @@
       document.getElementById("greeting").innerText = `Hoş geldin, ${playerName}!`;
       renderUpgrades();
       updateLeaderboard();
+      setInterval(showGoldenClick, 15000);
     }
 
     function clickButton() {
       score += power;
+      document.getElementById("clickSound").play();
       updateScore();
     }
 
@@ -206,6 +227,44 @@
         li.innerText = `${i + 1}. ${s.name} - ${s.score} puan`;
         list.appendChild(li);
       });
+    }
+
+    function toggleTheme() {
+      isDark = !isDark;
+      document.body.style.background = isDark ? "#121212" : "#ffffff";
+      document.body.style.color = isDark ? "white" : "black";
+    }
+
+    function startMiniGame() {
+      let count = 0;
+      const tempPower = power;
+      power = 1;
+      alert("5 saniyede en fazla tıkla!");
+      const originalClick = clickButton;
+      const timer = setTimeout(() => {
+        power = tempPower;
+        alert(`Süre doldu! Toplam ${count} tıklama yaptın.`);
+      }, 5000);
+      clickButton = function () {
+        count++;
+        score++;
+        updateScore();
+      };
+      setTimeout(() => clickButton = originalClick, 5000);
+    }
+
+    function showGoldenClick() {
+      const btn = document.getElementById("goldenClick");
+      btn.classList.remove("hidden");
+      setTimeout(() => btn.classList.add("hidden"), 4000);
+    }
+
+    function goldenReward() {
+      const reward = Math.floor(Math.random() * 100 + 100);
+      alert(`Altın tık ile ${reward} puan kazandın!`);
+      score += reward;
+      updateScore();
+      document.getElementById("goldenClick").classList.add("hidden");
     }
   </script>
 </body>
