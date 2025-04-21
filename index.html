@@ -1,36 +1,84 @@
-import tkinter as tk
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Zamanda Tıklama - Taş Devri</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive;
+      text-align: center;
+      background-color: #dcd0c0;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-top: 30px;
+    }
+    #energy {
+      font-size: 1.8em;
+      margin: 20px;
+    }
+    button {
+      font-size: 1.5em;
+      padding: 15px 30px;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    .upgrade {
+      background-color: #a1887f;
+      color: white;
+    }
+    .clicker {
+      background-color: #6d4c41;
+      color: white;
+    }
+  </style>
+</head>
+<body>
 
-class ZamandaTıklama:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Zamanda Tıklama - Taş Devri")
+  <h1>🪓 Zamanda Tıklama - Taş Devri</h1>
+  <div id="energy">Zaman Enerjisi: 0</div>
+  <button class="clicker" onclick="clickEnergy()">Sopayla Vur!</button><br>
+  <button class="upgrade" onclick="buyUpgrade()">Güçlü Sopa Al (10 Enerji)</button>
 
-        self.energy = 0
-        self.energy_per_click = 1
-        self.upgrade_cost = 10
+  <script>
+    let energy = parseInt(localStorage.getItem('energy')) || 0;
+    let energyPerClick = parseInt(localStorage.getItem('energyPerClick')) || 1;
+    let upgradeCost = parseInt(localStorage.getItem('upgradeCost')) || 10;
 
-        self.label = tk.Label(root, text="Zaman Enerjisi: 0", font=("Arial", 16))
-        self.label.pack(pady=10)
+    const energyDisplay = document.getElementById('energy');
+    const upgradeButton = document.querySelector('.upgrade');
 
-        self.click_button = tk.Button(root, text="🪓 Sopayla Vur!", font=("Arial", 20), command=self.click)
-        self.click_button.pack(pady=10)
+    function updateDisplay() {
+      energyDisplay.innerText = `Zaman Enerjisi: ${energy}`;
+      upgradeButton.innerText = `Güçlü Sopa Al (${upgradeCost} Enerji)`;
+    }
 
-        self.upgrade_button = tk.Button(root, text="🪙 Güçlü Sopa Al (10 Enerji)", font=("Arial", 14), command=self.upgrade)
-        self.upgrade_button.pack(pady=10)
+    function clickEnergy() {
+      energy += energyPerClick;
+      saveGame();
+      updateDisplay();
+    }
 
-    def click(self):
-        self.energy += self.energy_per_click
-        self.label.config(text=f"Zaman Enerjisi: {self.energy}")
+    function buyUpgrade() {
+      if (energy >= upgradeCost) {
+        energy -= upgradeCost;
+        energyPerClick += 1;
+        upgradeCost = Math.floor(upgradeCost * 1.5);
+        saveGame();
+        updateDisplay();
+      }
+    }
 
-    def upgrade(self):
-        if self.energy >= self.upgrade_cost:
-            self.energy -= self.upgrade_cost
-            self.energy_per_click += 1
-            self.upgrade_cost = int(self.upgrade_cost * 1.5)
-            self.upgrade_button.config(text=f"🪙 Güçlü Sopa Al ({self.upgrade_cost} Enerji)")
-            self.label.config(text=f"Zaman Enerjisi: {self.energy}")
+    function saveGame() {
+      localStorage.setItem('energy', energy);
+      localStorage.setItem('energyPerClick', energyPerClick);
+      localStorage.setItem('upgradeCost', upgradeCost);
+    }
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    game = ZamandaTıklama(root)
-    root.mainloop()
+    // Oyun başladığında
+    updateDisplay();
+  </script>
+
+</body>
+</html>
