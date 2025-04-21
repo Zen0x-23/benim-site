@@ -2,131 +2,171 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Clicker Oyunu Gelişmiş</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clicker Oyunu</title>
   <style>
     body {
-      background-color: #1b1b1b;
-      color: #fff;
+      background: #121212;
+      color: white;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 50px;
+      padding: 20px;
     }
-
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
+    #game {
+      max-width: 600px;
+      margin: auto;
     }
-
-    #puan, #seviye, #kayitli {
-      font-size: 1.5em;
-      margin: 10px;
-    }
-
     button {
-      padding: 15px 30px;
-      font-size: 18px;
+      padding: 15px 25px;
       margin: 10px;
+      font-size: 18px;
+      border-radius: 10px;
       border: none;
-      border-radius: 12px;
       cursor: pointer;
-      transition: 0.2s;
     }
-
-    #tiklaBtn {
-      background-color: #007bff;
-      color: white;
+    .upgrade, .box {
+      display: block;
+      margin: 10px auto;
+      width: 80%;
     }
-
-    #tiklaBtn:hover {
-      background-color: #0056b3;
+    .hidden {
+      display: none;
     }
-
-    #otoBtn {
-      background-color: #28a745;
-      color: white;
-    }
-
-    #otoBtn:disabled {
-      background-color: #4e4e4e;
-    }
-
-    #upgradeBtn {
-      background-color: #ffc107;
-      color: #000;
-    }
-
-    #upgradeBtn:disabled {
-      background-color: #4e4e4e;
+    #leaderboard {
+      margin-top: 30px;
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
+  <div id="game">
+    <h1>🔥 Clicker Oyunu 🔥</h1>
+    <div id="namePrompt">
+      <p>Adını gir:</p>
+      <input type="text" id="playerName" placeholder="Oyuncu Adı">
+      <button onclick="startGame()">Başla</button>
+    </div>
+    <div id="mainGame" class="hidden">
+      <h2 id="greeting"></h2>
+      <h3 id="score">Puan: 0</h3>
+      <button onclick="clickButton()">TIKLA</button>
 
-  <h1>🔥 Süper Clicker Oyunu 🔥</h1>
-  <div id="puan">Puan: 0</div>
-  <div id="seviye">Seviye: 1</div>
-  <div id="kayitli">Son kayıtlı puan: 0</div>
+      <div id="upgrades"></div>
 
-  <button id="tiklaBtn">Tıkla!</button>
-  <button id="otoBtn">Oto-Tıkla (100 puan)</button>
-  <button id="upgradeBtn">2x Kazanç (200 puan)</button>
+      <h3>Kutular</h3>
+      <button class="box" onclick="openBox('small')">🎁 Küçük Kutu</button>
+      <button class="box" onclick="openBox('big')">🎁 Büyük Kutu</button>
+      <button class="box" onclick="openBox('mega')">🎁 Mega Kutu</button>
 
-  <!-- Ses efekti -->
-  <audio id="sesEfekti" src="https://www.soundjay.com/button/button-3.mp3" preload="auto"></audio>
+      <div id="leaderboard">
+        <h3>🏆 Liderlik Tablosu</h3>
+        <ul id="scores"></ul>
+      </div>
+    </div>
+  </div>
 
   <script>
-    let puan = parseInt(localStorage.getItem("puan")) || 0;
-    let seviye = Math.floor(puan / 50) + 1;
-    let autoClick = false;
-    let upgrade = false;
+    let score = 0;
+    let power = 1;
+    let interval = null;
+    let upgrades = [
+      { name: '2x Tıklama Gücü', cost: 50, effect: () => power *= 2 },
+      { name: 'Pasif Gelir +1/sn', cost: 100, effect: () => startAuto(1000, 1) },
+      { name: 'Tıklama +5', cost: 150, effect: () => power += 5 },
+      { name: 'Pasif Gelir +5/sn', cost: 300, effect: () => startAuto(1000, 5) },
+      { name: '3x Tıklama Gücü', cost: 400, effect: () => power *= 3 },
+      { name: 'Pasif Gelir +10/sn', cost: 500, effect: () => startAuto(1000, 10) },
+      { name: 'Süper Hız 0.5sn', cost: 800, effect: () => startAuto(500, 5) },
+      { name: 'Tıklama +10', cost: 1000, effect: () => power += 10 },
+      { name: 'Mega Tıklama', cost: 1500, effect: () => power *= 5 },
+      { name: 'Pasif Gelir +20/sn', cost: 2000, effect: () => startAuto(1000, 20) },
+      { name: 'Kutulardan Çıkan %50 Bonus', cost: 2500, effect: () => bonusBox += 0.5 },
+      { name: '4x Tıklama Gücü', cost: 3000, effect: () => power *= 4 },
+      { name: 'Sonsuz Mod', cost: 4000, effect: () => startAuto(100, 2) },
+      { name: 'Ultra Güç', cost: 5000, effect: () => power += 100 },
+      { name: 'Tanrı Tıklaması', cost: 10000, effect: () => power *= 10 }
+    ];
 
-    const puanYazi = document.getElementById("puan");
-    const seviyeYazi = document.getElementById("seviye");
-    const kayitliYazi = document.getElementById("kayitli");
-    const tiklaBtn = document.getElementById("tiklaBtn");
-    const otoBtn = document.getElementById("otoBtn");
-    const upgradeBtn = document.getElementById("upgradeBtn");
-    const ses = document.getElementById("sesEfekti");
+    let bonusBox = 0;
+    let playerName = '';
 
-    function guncelle() {
-      puanYazi.textContent = `Puan: ${puan}`;
-      seviye = Math.floor(puan / 50) + 1;
-      seviyeYazi.textContent = `Seviye: ${seviye}`;
-      localStorage.setItem("puan", puan);
+    function startGame() {
+      playerName = document.getElementById("playerName").value;
+      if (!playerName) return alert("Lütfen isim gir");
+      document.getElementById("namePrompt").classList.add("hidden");
+      document.getElementById("mainGame").classList.remove("hidden");
+      document.getElementById("greeting").innerText = `Hoş geldin, ${playerName}!`;
+      renderUpgrades();
+      updateLeaderboard();
     }
 
-    tiklaBtn.onclick = () => {
-      puan += upgrade ? 2 : 1;
-      ses.play();
-      guncelle();
-    };
+    function clickButton() {
+      score += power;
+      updateScore();
+    }
 
-    otoBtn.onclick = () => {
-      if (puan >= 100 && !autoClick) {
-        puan -= 100;
-        autoClick = true;
-        otoBtn.disabled = true;
-        setInterval(() => {
-          puan += upgrade ? 2 : 1;
-          guncelle();
-        }, 1000);
-        guncelle();
-      }
-    };
+    function updateScore() {
+      document.getElementById("score").innerText = `Puan: ${score}`;
+    }
 
-    upgradeBtn.onclick = () => {
-      if (puan >= 200 && !upgrade) {
-        puan -= 200;
-        upgrade = true;
-        upgradeBtn.disabled = true;
-        guncelle();
-      }
-    };
+    function startAuto(speed, amount) {
+      setInterval(() => {
+        score += amount;
+        updateScore();
+      }, speed);
+    }
 
-    // Başlangıçta göster
-    guncelle();
-    kayitliYazi.textContent = "Son kayıtlı puan: " + puan;
+    function renderUpgrades() {
+      const upDiv = document.getElementById("upgrades");
+      upgrades.forEach((upg, i) => {
+        const btn = document.createElement("button");
+        btn.className = "upgrade";
+        btn.innerText = `${upg.name} (${upg.cost} puan)`;
+        btn.onclick = () => {
+          if (score >= upg.cost) {
+            score -= upg.cost;
+            upg.effect();
+            btn.disabled = true;
+            updateScore();
+          }
+        };
+        upDiv.appendChild(btn);
+      });
+    }
+
+    function openBox(type) {
+      let reward = 0;
+      if (type === 'small') reward = Math.floor(Math.random() * 40 + 10);
+      else if (type === 'big') reward = Math.floor(Math.random() * 120 + 30);
+      else if (type === 'mega') reward = Math.floor(Math.random() * 500 + 100);
+      reward += Math.floor(reward * bonusBox);
+      alert(`${type.toUpperCase()} kutusundan ${reward} puan çıktı!`);
+      score += reward;
+      updateScore();
+      saveScore();
+    }
+
+    function saveScore() {
+      let scores = JSON.parse(localStorage.getItem("scores")) || [];
+      scores.push({ name: playerName, score });
+      scores.sort((a, b) => b.score - a.score);
+      scores = scores.slice(0, 5);
+      localStorage.setItem("scores", JSON.stringify(scores));
+      updateLeaderboard();
+    }
+
+    function updateLeaderboard() {
+      let scores = JSON.parse(localStorage.getItem("scores")) || [];
+      const list = document.getElementById("scores");
+      list.innerHTML = "";
+      scores.forEach((s, i) => {
+        const li = document.createElement("li");
+        li.innerText = `${i + 1}. ${s.name} - ${s.score} puan`;
+        list.appendChild(li);
+      });
+    }
   </script>
-
 </body>
 </html>
