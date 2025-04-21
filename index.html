@@ -1,234 +1,36 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clicker Oyunu</title>
-  <style>
-    body {
-      background: #121212;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    #game {
-      max-width: 600px;
-      margin: auto;
-    }
-    button {
-      padding: 15px 25px;
-      margin: 10px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-    }
-    .upgrade, .box {
-      display: block;
-      margin: 10px auto;
-      width: 80%;
-    }
-    .hidden {
-      display: none;
-    }
-    #leaderboard {
-      margin-top: 30px;
-      background: #1f1f1f;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    #statistics {
-      background: #1f1f1f;
-      margin-top: 20px;
-      padding: 20px;
-      border-radius: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div id="game">
-    <h1>🔥 Clicker Oyunu 🔥</h1>
-    <div id="namePrompt">
-      <p>Adını gir:</p>
-      <input type="text" id="playerName" placeholder="Oyuncu Adı">
-      <button onclick="startGame()">Başla</button>
-    </div>
-    <div id="mainGame" class="hidden">
-      <h2 id="greeting"></h2>
-      <h3 id="score">Puan: 0</h3>
-      <button onclick="clickButton()">TIKLA</button>
+import tkinter as tk
 
-      <h2>⚙️ Geliştirmeler</h2>
-      <div id="upgrades"></div>
+class ZamandaTıklama:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Zamanda Tıklama - Taş Devri")
 
-      <h2>📦 Kutular</h2>
-      <div id="boxes"></div>
+        self.energy = 0
+        self.energy_per_click = 1
+        self.upgrade_cost = 10
 
-      <div style="margin-top:20px">
-        <h3>🎁 Hediye Kodu</h3>
-        <input type="text" id="giftCodeInput" placeholder="Kod girin">
-        <button onclick="redeemCode()">Kodu Kullan</button>
-      </div>
+        self.label = tk.Label(root, text="Zaman Enerjisi: 0", font=("Arial", 16))
+        self.label.pack(pady=10)
 
-      <div id="leaderboard">
-        <h3>🏆 Liderlik Tablosu</h3>
-        <ul id="scores"></ul>
-      </div>
+        self.click_button = tk.Button(root, text="🪓 Sopayla Vur!", font=("Arial", 20), command=self.click)
+        self.click_button.pack(pady=10)
 
-      <div id="statistics">
-        <h3>📊 İstatistikler</h3>
-        <p id="statClicks">Toplam Tıklama: 0</p>
-        <p id="statBest">En Büyük Kazanç: 0</p>
-      </div>
-    </div>
-  </div>
+        self.upgrade_button = tk.Button(root, text="🪙 Güçlü Sopa Al (10 Enerji)", font=("Arial", 14), command=self.upgrade)
+        self.upgrade_button.pack(pady=10)
 
-  <script>
-    let score = 0;
-    let power = 1;
-    let interval = null;
-    let bonusBox = 0;
-    let playerName = '';
-    let usedCodes = [];
-    let totalClicks = 0;
-    let bestReward = 0;
+    def click(self):
+        self.energy += self.energy_per_click
+        self.label.config(text=f"Zaman Enerjisi: {self.energy}")
 
-    const giftCodes = {
-      "release": 100,
-      "Nebakıyon Ekmek": 150,
-      "dompolyo": 300,
-      "babapiro": 500,
-      "dayanamıyorumdayanamıyorum": 1000
-    };
+    def upgrade(self):
+        if self.energy >= self.upgrade_cost:
+            self.energy -= self.upgrade_cost
+            self.energy_per_click += 1
+            self.upgrade_cost = int(self.upgrade_cost * 1.5)
+            self.upgrade_button.config(text=f"🪙 Güçlü Sopa Al ({self.upgrade_cost} Enerji)")
+            self.label.config(text=f"Zaman Enerjisi: {self.energy}")
 
-    const upgrades = Array.from({length: 60}, (_, i) => {
-      return {
-        name: `Geliştirme ${i + 1}`,
-        cost: (i + 1) * 100,
-        effect: () => {
-          power += Math.ceil((i + 1) * 0.5);
-        }
-      };
-    });
-
-    const boxTypes = [
-      { name: 'Kutu 1', cost: 20, rewardMin: 10, rewardMax: 50 },
-      { name: 'Kutu 2', cost: 40, rewardMin: 30, rewardMax: 100 },
-      { name: 'Kutu 3', cost: 60, rewardMin: 50, rewardMax: 150 },
-      { name: 'Kutu 4', cost: 80, rewardMin: 60, rewardMax: 180 },
-      { name: 'Kutu 5', cost: 100, rewardMin: 80, rewardMax: 220 },
-      { name: 'Kutu 6', cost: 120, rewardMin: 90, rewardMax: 300 },
-      { name: 'Kutu 7', cost: 150, rewardMin: 120, rewardMax: 400 },
-      { name: 'Kutu 8', cost: 180, rewardMin: 150, rewardMax: 500 },
-      { name: 'Kutu 9', cost: 200, rewardMin: 180, rewardMax: 600 },
-      { name: 'Kutu 10', cost: 250, rewardMin: 200, rewardMax: 800 }
-    ];
-
-    function startGame() {
-      playerName = document.getElementById("playerName").value;
-      if (!playerName) return alert("Lütfen isim gir");
-      document.getElementById("namePrompt").classList.add("hidden");
-      document.getElementById("mainGame").classList.remove("hidden");
-      document.getElementById("greeting").innerText = `Hoş geldin, ${playerName}!`;
-      renderUpgrades();
-      renderBoxes();
-      updateLeaderboard();
-    }
-
-    function clickButton() {
-      totalClicks++;
-      score += power;
-      updateScore();
-      document.getElementById("statClicks").innerText = `Toplam Tıklama: ${totalClicks}`;
-    }
-
-    function updateScore() {
-      document.getElementById("score").innerText = `Puan: ${score}`;
-    }
-
-    function renderUpgrades() {
-      const upDiv = document.getElementById("upgrades");
-      upgrades.forEach((upg, i) => {
-        const btn = document.createElement("button");
-        btn.className = "upgrade";
-        btn.innerText = `${upg.name} (${upg.cost} puan)`;
-        btn.onclick = () => {
-          if (score >= upg.cost) {
-            score -= upg.cost;
-            upg.effect();
-            btn.disabled = true;
-            updateScore();
-          }
-        };
-        upDiv.appendChild(btn);
-      });
-    }
-
-    function renderBoxes() {
-      const boxDiv = document.getElementById("boxes");
-      boxTypes.forEach((box, i) => {
-        const btn = document.createElement("button");
-        btn.className = "box";
-        btn.innerText = `${box.name} (${box.cost} puan)`;
-        btn.onclick = () => openBox(i);
-        boxDiv.appendChild(btn);
-      });
-    }
-
-    function openBox(index) {
-      const box = boxTypes[index];
-      if (score < box.cost) {
-        alert(`Yetersiz puan! (${box.cost} puan gerekiyor)`);
-        return;
-      }
-      score -= box.cost;
-      let reward = Math.floor(Math.random() * (box.rewardMax - box.rewardMin + 1) + box.rewardMin);
-      reward += Math.floor(reward * bonusBox);
-      if (reward > bestReward) bestReward = reward;
-      document.getElementById("statBest").innerText = `En Büyük Kazanç: ${bestReward}`;
-      alert(`${box.name} kutusundan ${reward} puan çıktı!`);
-      score += reward;
-      updateScore();
-      saveScore();
-    }
-
-    function redeemCode() {
-      const input = document.getElementById("giftCodeInput").value.trim();
-      if (giftCodes[input]) {
-        if (usedCodes.includes(input)) {
-          alert("Bu kod daha önce kullanıldı.");
-          return;
-        }
-        score += giftCodes[input];
-        usedCodes.push(input);
-        alert(`${input} kodundan ${giftCodes[input]} puan kazandın!`);
-        updateScore();
-        saveScore();
-      } else {
-        alert("Geçersiz kod!");
-      }
-    }
-
-    function saveScore() {
-      let scores = JSON.parse(localStorage.getItem("scores")) || [];
-      scores.push({ name: playerName, score });
-      scores.sort((a, b) => b.score - a.score);
-      scores = scores.slice(0, 5);
-      localStorage.setItem("scores", JSON.stringify(scores));
-      updateLeaderboard();
-    }
-
-    function updateLeaderboard() {
-      let scores = JSON.parse(localStorage.getItem("scores")) || [];
-      const list = document.getElementById("scores");
-      list.innerHTML = "";
-      scores.forEach((s, i) => {
-        const li = document.createElement("li");
-        li.innerText = `${i + 1}. ${s.name} - ${s.score} puan`;
-        list.appendChild(li);
-      });
-    }
-  </script>
-</body>
-</html>
+if __name__ == "__main__":
+    root = tk.Tk()
+    game = ZamandaTıklama(root)
+    root.mainloop()
