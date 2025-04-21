@@ -60,6 +60,12 @@
       <button class="box" onclick="openBox('big')">🎁 Büyük Kutu (70 puan)</button>
       <button class="box" onclick="openBox('mega')">🎁 Mega Kutu (150 puan)</button>
 
+      <div style="margin-top:20px">
+        <h3>🎁 Hediye Kodu</h3>
+        <input type="text" id="giftCodeInput" placeholder="Kod girin">
+        <button onclick="redeemCode()">Kodu Kullan</button>
+      </div>
+
       <div id="leaderboard">
         <h3>🏆 Liderlik Tablosu</h3>
         <ul id="scores"></ul>
@@ -71,7 +77,19 @@
     let score = 0;
     let power = 1;
     let interval = null;
-    let upgrades = [
+    let bonusBox = 0;
+    let playerName = '';
+    let usedCodes = [];
+
+    const giftCodes = {
+      "release": 100,
+      "Nebakıyon Ekmek": 150,
+      "dompolyo": 300,
+      "babapiro": 500,
+      "dayanamıyorumdayanamıyorum": 1000
+    };
+
+    const upgrades = [
       { name: '2x Tıklama Gücü', cost: 50, effect: () => power *= 2 },
       { name: 'Pasif Gelir +1/sn', cost: 100, effect: () => startAuto(1000, 1) },
       { name: 'Tıklama +5', cost: 150, effect: () => power += 5 },
@@ -88,9 +106,6 @@
       { name: 'Ultra Güç', cost: 5000, effect: () => power += 100 },
       { name: 'Tanrı Tıklaması', cost: 10000, effect: () => power *= 10 }
     ];
-
-    let bonusBox = 0;
-    let playerName = '';
 
     function startGame() {
       playerName = document.getElementById("playerName").value;
@@ -156,6 +171,23 @@
       saveScore();
     }
 
+    function redeemCode() {
+      const input = document.getElementById("giftCodeInput").value.trim();
+      if (giftCodes[input]) {
+        if (usedCodes.includes(input)) {
+          alert("Bu kod daha önce kullanıldı.");
+          return;
+        }
+        score += giftCodes[input];
+        usedCodes.push(input);
+        alert(`${input} kodundan ${giftCodes[input]} puan kazandın!`);
+        updateScore();
+        saveScore();
+      } else {
+        alert("Geçersiz kod!");
+      }
+    }
+
     function saveScore() {
       let scores = JSON.parse(localStorage.getItem("scores")) || [];
       scores.push({ name: playerName, score });
@@ -178,3 +210,4 @@
   </script>
 </body>
 </html>
+
