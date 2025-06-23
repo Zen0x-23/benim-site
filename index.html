@@ -1,95 +1,27 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sitem - Yukarı Kaydır Butonu</title>
-    <style>
-        /* CSS Kodları */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            min-height: 2000px; /* Butonun görünmesi için yeterince uzun bir sayfa */
-            background-color: #f4f4f4;
-        }
-
-        .content {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        #myBtn {
-            display: none; /* Varsayılan olarak gizli */
-            position: fixed; /* Sabit konum */
-            bottom: 30px; /* Sayfanın altından 30px yukarıda */
-            right: 30px; /* Sayfanın sağından 30px içeride */
-            z-index: 99; /* Diğer elementlerin üzerinde */
-            border: none; /* Kenarlık yok */
-            outline: none; /* Dış çizgi yok */
-            background-color: #007bff; /* Mavi arka plan */
-            color: white; /* Beyaz yazı */
-            cursor: pointer; /* Fare imleci el işareti */
-            padding: 15px; /* İç boşluk */
-            border-radius: 10px; /* Köşeleri yuvarla */
-            font-size: 18px; /* Yazı boyutu */
-            transition: opacity 0.3s; /* Geçiş efekti */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        #myBtn:hover {
-            background-color: #0056b3; /* Hover rengi */
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Brawlify Clone - Brawl Stars Harita & Karakter Rehberi</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
+<header>
+  <h1>Brawlify Clone: Brawl Stars Harita & Karakter Rehberi</h1>
+  <nav>
+    <ul id="modeList"></ul>
+  </nav>
+  <input
+    type="text"
+    id="searchInput"
+    placeholder="Harita veya karakter ara..."
+    autocomplete="off"
+  />
+</header>
+<main id="content"></main>
 
-    <div class="content">
-        <h1>Sitenize Hoş Geldiniz!</h1>
-        <p>Bu, web sitenizin ana içeriğidir. Sayfanın sonuna doğru ilerledikçe, sağ alt köşede "Yukarı Çık" butonunu göreceksiniz. Bu buton, uzun içerikli sayfalarda kullanıcı deneyimini iyileştirmek için oldukça kullanışlıdır.</p>
-        <p>Aşağı kaydırmaya devam edin...</p>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-        <p>Nunc vel risus et diam auctor interdum. Mauris ut magna et dolor scelerisque accumsan. Nullam vel purus in tortor scelerisque mattis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec ac magna nec libero tincidunt placerat. Donec in nulla nec odio vestibulum ultrices vel in justo. Suspendisse potenti.</p>
-        <p>Fusce tincidunt, felis ac efficitur fermentum, nunc ex efficitur metus, vel interdum velit odio nec nisi. Praesent vitae mi in nulla consectetur bibendum. Curabitur sed neque vel nisi gravida pellentesque. Vivamus euismod elit nec sapien tristique, ut bibendum risus ullamcorper. Aliquam erat volutpat. Integer eu ipsum in turpis gravida laoreet.</p>
-        <p>Aliquam erat volutpat. Phasellus vel lectus sit amet magna congue tristique. Nam ac purus eu odio malesuada elementum. Maecenas ac ante et velit lacinia ullamcorper at ut justo. Curabitur vel leo nec elit iaculis bibendum a ac tortor. Integer in mauris ac ligula hendrerit consequat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
-        <p>Nullam vel risus et diam auctor interdum. Mauris ut magna et dolor scelerisque accumsan. Nullam vel purus in tortor scelerisque mattis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec ac magna nec libero tincidunt placerat. Donec in nulla nec odio vestibulum ultrices vel in justo. Suspendisse potenti.</p>
-        <p>Fusce tincidunt, felis ac efficitur fermentum, nunc ex efficitur metus, vel interdum velit odio nec nisi. Praesent vitae mi in nulla consectetur bibendum. Curabitur sed neque vel nisi gravida pellentesque. Vivamus euismod elit nec sapien tristique, ut bibendum risus ullamcorper. Aliquam erat volutpat. Integer eu ipsum in turpis gravida laoreet.</p>
-        <p>Aliquam erat volutpat. Phasellus vel lectus sit amet magna congue tristique. Nam ac purus eu odio malesuada elementum. Maecenas ac ante et velit lacinia ullamcorper at ut justo. Curabitur vel leo nec elit iaculis bibendum a ac tortor. Integer in mauris ac ligula hendrerit consequat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
-        <p>Nullam vel risus et diam auctor interdum. Mauris ut magna et dolor scelerisque accumsan. Nullam vel purus in tortor scelerisque mattis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec ac magna nec libero tincidunt placerat. Donec in nulla nec odio vestibulum ultrices vel in justo. Suspendisse potenti.</p>
-        <p>Fusce tincidunt, felis ac efficitur fermentum, nunc ex efficitur metus, vel interdum velit odio nec nisi. Praesent vitae mi in nulla consectetur bibendum. Curabitur sed neque vel nisi gravida pellentesque. Vivamus euismod elit nec sapien tristique, ut bibendum risus ullamcorper. Aliquam erat volutpat. Integer eu ipsum in turpis gravida laoreet.</p>
-        <p>Aliquam erat volutpat. Phasellus vel lectus sit amet magna congue tristique. Nam ac purus eu odio malesuada elementum. Maecenas ac ante et velit lacinia ullamcorper at ut justo. Curabitur vel leo nec elit iaculis bibendum a ac tortor. Integer in mauris ac ligula hendrerit consequat. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
-    </div>
-
-    <button onclick="topFunction()" id="myBtn" title="Yukarı Çık">Yukarı Çık</button>
-
-    <script>
-        // JavaScript Kodları
-
-        // Butonu al
-        let mybutton = document.getElementById("myBtn");
-
-        // Kullanıcı sayfayı aşağı kaydırdığında butonu göster/gizle
-        window.onscroll = function() {scrollFunction()};
-
-        function scrollFunction() {
-            // Eğer sayfa 20px'ten fazla aşağı kaydırıldıysa butonu göster
-            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-                mybutton.style.display = "block";
-            } else {
-                mybutton.style.display = "none";
-            }
-        }
-
-        // Kullanıcı butona tıkladığında sayfanın en üstüne kaydır
-        function topFunction() {
-            document.body.scrollTop = 0; // Safari için
-            document.documentElement.scrollTop = 0; // Chrome, Firefox, IE ve Opera için
-        }
-    </script>
-
+<script src="app.js"></script>
 </body>
 </html>
+
